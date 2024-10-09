@@ -1,14 +1,8 @@
-import React, { Component } from 'react';
-
-
-const validateEmail = (email) => /\S+@\S+\.\S+/.test(email);
-const validatePassword = (password) => password.length >= 6;
-
 class AuthForm extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      isLogin: true, 
+      isLogin: true,
       loginEmail: '',
       loginPassword: '',
       registerEmail: '',
@@ -28,11 +22,7 @@ class AuthForm extends Component {
     this.setState((prevState) => ({ isLogin: !prevState.isLogin }));
   };
 
-  handleLoginChange = (e) => {
-    this.setState({ [e.target.name]: e.target.value });
-  };
-
-  handleRegisterChange = (e) => {
+  handleChange = (e) => {
     this.setState({ [e.target.name]: e.target.value });
   };
 
@@ -57,7 +47,6 @@ class AuthForm extends Component {
     e.preventDefault();
     const errors = this.validateLogin();
     if (Object.keys(errors).length === 0) {
-
       alert('Login successful');
     } else {
       this.setState({ errors });
@@ -68,7 +57,6 @@ class AuthForm extends Component {
     e.preventDefault();
     const errors = this.validateRegister();
     if (Object.keys(errors).length === 0) {
-     
       alert('Registration successful');
     } else {
       this.setState({ errors });
@@ -80,73 +68,30 @@ class AuthForm extends Component {
 
     return (
       <div style={{ display: 'flex', justifyContent: 'space-around', padding: '20px' }}>
-        <div style={{ flex: 1, padding: '20px', borderRight: '1px solid #ccc' }}>
-          <h2>Login</h2>
-          <form onSubmit={this.handleLoginSubmit}>
-            <div>
-              <label>Email:</label>
-              <input
-                type="email"
-                name="loginEmail"
-                value={loginEmail}
-                onChange={this.handleLoginChange}
-              />
-              {errors.loginEmail && <span style={{ color: 'red' }}>{errors.loginEmail}</span>}
-            </div>
-            <div>
-              <label>Password:</label>
-              <input
-                type="password"
-                name="loginPassword"
-                value={loginPassword}
-                onChange={this.handleLoginChange}
-              />
-              {errors.loginPassword && <span style={{ color: 'red' }}>{errors.loginPassword}</span>}
-            </div>
-            <button type="submit">Login</button>
-          </form>
-        </div>
-
-        <div style={{ flex: 1, padding: '20px' }}>
-          <h2>Register</h2>
-          <form onSubmit={this.handleRegisterSubmit}>
-            <div>
-              <label>Email:</label>
-              <input
-                type="email"
-                name="registerEmail"
-                value={registerEmail}
-                onChange={this.handleRegisterChange}
-              />
-              {errors.registerEmail && <span style={{ color: 'red' }}>{errors.registerEmail}</span>}
-            </div>
-            <div>
-              <label>Password:</label>
-              <input
-                type="password"
-                name="registerPassword"
-                value={registerPassword}
-                onChange={this.handleRegisterChange}
-              />
-              {errors.registerPassword && <span style={{ color: 'red' }}>{errors.registerPassword}</span>}
-            </div>
-            <div>
-              <label>Confirm Password:</label>
-              <input
-                type="password"
-                name="registerConfirmPassword"
-                value={registerConfirmPassword}
-                onChange={this.handleRegisterChange}
-              />
-              {errors.registerConfirmPassword && <span style={{ color: 'red' }}>{errors.registerConfirmPassword}</span>}
-            </div>
-            <button type="submit">Register</button>
-          </form>
-        </div>
+        {isLogin ? (
+          <LoginForm
+            email={loginEmail}
+            password={loginPassword}
+            errors={errors}
+            onChange={this.handleChange}
+            onSubmit={this.handleLoginSubmit}
+          />
+        ) : (
+          <RegisterForm
+            email={registerEmail}
+            password={registerPassword}
+            confirmPassword={registerConfirmPassword}
+            errors={errors}
+            onChange={this.handleChange}
+            onSubmit={this.handleRegisterSubmit}
+          />
+        )}
+        <button onClick={this.toggleForm}>
+          Switch to {isLogin ? 'Register' : 'Login'}
+        </button>
       </div>
     );
   }
 }
 
 export default AuthForm;
-

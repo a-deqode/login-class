@@ -4,7 +4,6 @@ import Registration from './Registration';
 import Login from './Login';
 import UserList from './UserList';
 
-const userDatabase = [];
 
 class App extends Component {
   state = {
@@ -15,27 +14,34 @@ class App extends Component {
 
   componentDidMount() {
     const token = localStorage.getItem('token');
+    const users = JSON.parse(localStorage.getItem('users')) || [];
     if (token) {
-      this.setState({ isAuthenticated: true, token });
+      this.setState({ isAuthenticated: true, token, users });
     }
   }
 
   registerUser = (newUser) => {
+    const userDatabase = JSON.parse(localStorage.getItem('users')) || [];
     const userExists = userDatabase.some(user => user.email === newUser.email);
+    
     if (userExists) {
       alert('User already exists');
       return;
     }
+
     userDatabase.push(newUser);
+    localStorage.setItem('users', JSON.stringify(userDatabase));
     this.setState({ users: userDatabase });
   };
 
   handleLogin = (email, password) => {
+    const userDatabase = JSON.parse(localStorage.getItem('users')) || [];
     const user = userDatabase.find(user => user.email === email && user.password === password);
+    
     if (user) {
       const token = `token-${user.username}`;
       localStorage.setItem('token', token);
-      this.setState({ token, isAuthenticated: true });
+      this.setState({ token, isAuthenticated: true, users: userDatabase });
       alert('Login successful');
     } else {
       alert('Invalid email or password');
@@ -48,17 +54,17 @@ class App extends Component {
   };
 
   render() {
-    const { isAuthenticated, token } = this.state;
+    const { isAuthenticated, token, users } = this.state;
 
     return (
       <Router>
-        <div style={{ padding: '20px' }}>
+        <div className="app-container">
           <Routes>
             <Route path="/register" element={<Registration registerUser={this.registerUser} />} />
             <Route path="/login" element={<Login onLogin={this.handleLogin} />} />
             <Route path="/users" element={
               isAuthenticated ? (
-                <UserList users={userDatabase} token={token} onLogout={this.handleLogout} />
+                <UserList users={users} token={token} onLogout={this.handleLogout} />
               ) : (
                 <Navigate to="/login" />
               )
